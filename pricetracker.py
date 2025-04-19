@@ -65,7 +65,7 @@ def search_product_on_website(product_name: str, website_url: str, website_name:
 
 def main():
     # Product to search for
-    product_name = "HP PAVILION PLUS"
+    product_name = input("ENTER THE PRODUCT NAME WITH MODEL NUMBER:")
     
     # Websites to search
     websites: Dict[str, str] = {
