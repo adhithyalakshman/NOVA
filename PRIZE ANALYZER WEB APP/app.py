@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 from nova_act import NovaAct, ActError
 from pydantic import BaseModel
-from concurrent.futures import ThreadPoolExecutor, as_completed
+
 from typing import Dict, List
 
 
@@ -47,6 +47,7 @@ def search_product_on_website(product_name: str, website_url: str, website_name:
                
                 nova.act("wait for first item to appear")
                 nova.act("click on first item")
+                nova.stop()
             
             
             
@@ -101,27 +102,15 @@ def home():
             "Amazon": "https://www.amazon.com"
            
         }
-        
         all_products: List[Product] = []
+        for j in websites.items():
+            x=search_product_on_website(product_name, j[1],j[0])
+            if x is not None:
+                all_products.append(x)
+
+
         
-        # Use ThreadPoolExecutor to search across websites in parallel
-        with ThreadPoolExecutor(max_workers=1) as executor:
-            # Submit all searches
-            future_to_website = {
-                executor.submit(search_product_on_website, product_name, url, name): name 
-                for name, url in websites.items()
-            }
-            
-            # Collect results
-            for future in as_completed(future_to_website.keys()):
-                website_name = future_to_website[future]
-                try:
-                    product = future.result()
-                    if product is not None:
-                        all_products.append(product)
-                except Exception as e:
-                    print( product_name)
-                    print(f"Error processing {website_name}: {str(e)}")
+      
         
         # Sort products by price
         all_products.sort(key=lambda x: x.price)
@@ -135,6 +124,18 @@ def home():
 
 if __name__ == '__main__':
     app.run(debug=True) 
+           
+
+
+
+ 
+
+    
+ 
+
+
+
+
 
 
     
