@@ -25,15 +25,28 @@ def search_product_on_website(product_name: str, website_url: str, website_name:
             
             # Different search commands for different websites
             
-            nova.act("wait for search box to appear")
-            nova.act("click on search box")
-            nova.act("wait for search box to be focused")
-            
-            nova.act(f"type {product_name} in search box")
-            
-            nova.act("press enter")
-            nova.act("wait for first result to appear")
-            nova.act("click on first result")
+            if "amazon" in website_url.lower():
+                nova.act("wait for search box to appear")
+                nova.act(f"type {product_name} in search box")
+                nova.act("press enter")
+                nova.act("wait for first result to appear")
+                nova.act("click on first result")
+            elif "flipkart" in website_url.lower():
+                nova.act("wait for search box to appear")
+                nova.act(f"type {product_name} in search box")
+                nova.act("press enter")
+                
+                nova.act("wait for first product to appear")
+                nova.act("click on first result")
+            elif "walmart" in website_url.lower():
+                
+                nova.act("wait for search box to appear")
+
+                nova.act(f"type {product_name} in search box")
+                nova.act("press enter")
+               
+                nova.act("wait for first item to appear")
+                nova.act("click on first item")
             
             
             
@@ -56,8 +69,9 @@ def search_product_on_website(product_name: str, website_url: str, website_name:
             return product
             
     except Exception as e:
-        print(f"Error searching {website_name}: {str(e)}")
+        print(f"Error searching {website_name}: {e}")
         return None
+
 
 
     
@@ -75,20 +89,23 @@ def search_product_on_website(product_name: str, website_url: str, website_name:
 def home():
     if request.method == 'POST':
         product_name = request.form.get('product_name')
+        print(product_name)
         if not product_name:
             return render_template('home.html', error="Please enter a product name")
         
         # Websites to search
         websites: Dict[str, str] = {
-            "Amazon": "https://www.amazon.com",
+             "Walmart": "https://www.walmart.com",
+            
             "Flipkart": "https://www.flipkart.com",
-            "Walmart": "https://www.walmart.com"
+            "Amazon": "https://www.amazon.com"
+           
         }
         
         all_products: List[Product] = []
         
         # Use ThreadPoolExecutor to search across websites in parallel
-        with ThreadPoolExecutor(max_workers=3) as executor:
+        with ThreadPoolExecutor(max_workers=1) as executor:
             # Submit all searches
             future_to_website = {
                 executor.submit(search_product_on_website, product_name, url, name): name 
@@ -103,6 +120,7 @@ def home():
                     if product is not None:
                         all_products.append(product)
                 except Exception as e:
+                    print( product_name)
                     print(f"Error processing {website_name}: {str(e)}")
         
         # Sort products by price
@@ -117,3 +135,6 @@ def home():
 
 if __name__ == '__main__':
     app.run(debug=True) 
+
+
+    
