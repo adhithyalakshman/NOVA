@@ -62,7 +62,7 @@ def search_product_on_website(product_name: str, website_url: str, website_name:
         print(f"Error searching {website_name}: {str(e)}")
         return None
 def main():
-    client = genai.Client(api_key="AIzaSyB2nmWsJ4zLqOG2Q1fFZEnfMKRG325yIhk")
+    client = genai.Client(api_key="your secret API key")
     
     print("Welcome! I'm a product information chatbot. Type 'end' to exit.")
     print("Please enter your query about a product (e.g., 'what is cost of hp pavilion plus')")
