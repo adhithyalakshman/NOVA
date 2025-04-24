@@ -1,5 +1,0 @@
-Flask
-python-dotenv
-google-generativeai
-pydantic
-nova-act
