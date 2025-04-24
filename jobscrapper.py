@@ -48,8 +48,9 @@ def linkedin_job_scraper():
             jobs_data = []
             
             # Scrape first 10 jobs
-            for i in range(3):
+            for i in range(11):
                 try:
+                    
                     # Get job details
                     nova.act(f"click on job result number {i+1}")
                       # Wait for job details to load
