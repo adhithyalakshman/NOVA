@@ -1,6 +1,6 @@
 from getpass import getpass
 import time
-import csv
+import pandas as pd
 from datetime import datetime
 from nova_act import NovaAct, BOOL_SCHEMA
 
@@ -12,8 +12,6 @@ def linkedin_job_scraper():
         try:
             # Get job title from user
             job_title = input("Enter the job title you want to search for: ")
-            
-         
             
             # Check for captcha
             result = nova.act("Is there a captcha on the screen?", schema=BOOL_SCHEMA)
@@ -40,55 +38,59 @@ def linkedin_job_scraper():
             
             # Search for the job
             nova.act(f"type {job_title} in the search bar and press enter")
+            nova.act("press enter")
             
             # Add experience level filter for Entry level
             nova.act("click on Experience Level filter")
             nova.act("select Entry level option")
             
-            # Create CSV file with timestamp
+            # Create empty DataFrame
+            jobs_data = []
+            
+            # Scrape first 10 jobs
+            for i in range(3):
+                try:
+                    # Get job details
+                    nova.act(f"click on job result number {i+1}")
+                      # Wait for job details to load
+                    
+                    # Get job details
+                    # Extract job details with better prompts
+                    job_title_result = nova.act("Read the job title from the job details panel on the right side", schema={"type": "string"})
+                    company_name_result = nova.act("Read the company name from the job details panel on the right side", schema={"type": "string"})
+                    location_result = nova.act("Read the job location from the job details panel on the right side", schema={"type": "string"})
+
+                    job_title = job_title_result.parsed_response
+                    company_name = company_name_result.parsed_response
+                    location = location_result.parsed_response
+
+                    application_link = nova.page.url
+                    print(f"Found job: {job_title} at {company_name} in {location}")
+                    # Append to jobs_data list
+                    jobs_data.append({
+                        'Job Title': job_title,
+                        'Company Name': company_name,
+                        'Location': location,
+                        'Application Link': application_link
+                    })
+                    
+                    # Go back to search results
+                    nova.act("go back to search results")
+                     # Wait for results to load
+                    
+                except Exception as e:
+                    print(f"Error processing job {i+1}: {str(e)}")
+                    continue
+            
+            # Create DataFrame from collected data
+            df = pd.DataFrame(jobs_data)
+            
+            # Create filename with timestamp
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename = f"linkedin_jobs_{timestamp}.csv"
             
-            with open(filename, 'w', newline='', encoding='utf-8') as csvfile:
-                fieldnames = ['Job Title', 'Company Name', 'Location', 'Application Link']
-                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-                writer.writeheader()
-                
-                # Scrape first 100 jobs
-                for i in range(100):
-                    try:
-                        # Get job details
-                        nova.act(f"click on job result number {i+1}")
-                        time.sleep(2)  # Wait for job details to load
-                        
-                        # Get job title
-                        job_title = nova.act("get the job title").parsed_response
-                        
-                        # Get company name
-                        company_name = nova.act("get the company name").parsed_response
-                        
-                        # Get location
-                        location = nova.act("get the job location").parsed_response
-                        
-                        # Get application link
-                        application_link = nova.page.url
-                        
-                        # Write to CSV
-                        writer.writerow({
-                            'Job Title': job_title,
-                            'Company Name': company_name,
-                            'Location': location,
-                            'Application Link': application_link
-                        })
-                        
-                        # Go back to search results
-                        nova.act("go back to search results")
-                        time.sleep(1)  # Wait for results to load
-                        
-                    except Exception as e:
-                        print(f"Error processing job {i+1}: {str(e)}")
-                        continue
-                
+            # Save DataFrame to CSV
+            df.to_csv(filename, index=False, encoding='utf-8')
             print(f"\nJob data has been saved to {filename}")
             
         except Exception as e:
