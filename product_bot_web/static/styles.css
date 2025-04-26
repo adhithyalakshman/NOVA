@@ -47,3 +47,25 @@ button:hover {
     color: #5cb85c;
     margin-top: 20px;
 }
+.product-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.product-result {
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 8px;
+    background: #fafafa;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    text-align: left;
+}
+
+.product-result a {
+    color: #007BFF;
+    text-decoration: none;
+}
+
+.product-result a:hover {
+    text-decoration: underline;
