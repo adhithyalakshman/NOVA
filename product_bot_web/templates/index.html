@@ -30,9 +30,9 @@
 
         {% if result %}
             <h2>Results:</h2>
-            <ul>
+            <ul class="product-list">
                 {% for prod in result %}
-                    <li>
+                    <li class="product-result">
                         <strong>{{ prod.website }}</strong>:
                         <a href="{{ prod.product_link }}" target="_blank">
                             {{ prod.product_link }}
