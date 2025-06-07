@@ -14,16 +14,17 @@ with NovaAct(starting_page="https://www.tinkercad.com/dashboard") as nova:
     nova.start()
     #nova.act("wait for login button to appear")
     #nova.act("click on login")
-    nova.act("wait for personal account option")
-    nova.act("click on personal account")
+    
+    #nova.act("wait for personal account option")
+    #nova.act("click on personal account")
    
    
     input("\U0001F449 Please complete the Google sign-in and 2-Step Verification manually, then press ENTER to continue...") # May require credentials setup in browser session
 
     # Step 2: Create a new circuit project
-    nova.act("wait for create button to appear")
-    nova.act("click on create new")
-    nova.act("select circuits")
+    #nova.act("wait for create button to appear")
+    #nova.act("click on create new")
+    #nova.act("select circuits")
 
     # Step 3: Ask user for natural language prompt
     query_re = input("What project do you want to build? (e.g., 'Build a circuit to blink an LED using Arduino')\n>> ")
@@ -35,16 +36,16 @@ with NovaAct(starting_page="https://www.tinkercad.com/dashboard") as nova:
             contents=query_re,
             config=types.GenerateContentConfig(
                 system_instruction=(
-                    "You are a circuit planner for Tinkercad. Understand the user's request, analyze which components are required, how they should be connected, and provide exact NovaAct-style step-by-step action instructions to build the circuit.\n"
-                    "Return only a Python list of strings, each string being a valid NovaAct action (e.g., 'click on resistor', 'drag from pin A to pin B'). Do not include nova.act() wrapper."
+                    "You are a circuit planner for Tinkercad. Understand the user's request, analyze which components are required, how they should be connected, and provide exact NovaAct-style step-by-step action instructions to build the circuit  Return only a Python list of strings, each string being a valid NovaAct action (e.g., 'click on resistor', 'drag from pin A to pin B'). Do not include nova.act() wrapper. all actions for generating the circuit should be given"
                 )
             )
         )
 
         # Step 5: Extract action steps from Gemini response
         instructions_code = gemini_response.text.strip()
-        action = eval(instructions_code) if instructions_code.startswith('[') else []
-
+        #action = eval(instructions_code) if instructions_code.startswith('[') else []
+        print(instructions_code)
+        action = instructions_code.split("\n")
         # Step 6: Execute the action list
         for j in action:
             print(f"Executing: {j}")
@@ -56,3 +57,4 @@ with NovaAct(starting_page="https://www.tinkercad.com/dashboard") as nova:
 
     except Exception as e:
         print("[Error during Gemini interaction or execution]", e)
+
